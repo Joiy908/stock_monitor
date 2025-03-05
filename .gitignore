@@ -1,0 +1,3 @@
+.archVenv
+.env
+__pycache__
