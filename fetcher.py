@@ -2,9 +2,22 @@ import requests
 
 def fetch_stock_data(stock_code: str):
     url = f"http://qt.gtimg.cn/q={stock_code}"
-    response = requests.get(url)
-    response.encoding = "gbk"  # 解决中文乱码
-    data = response.text.split("=")[1].strip('"').split("~")
+    # try at most 3 times
+    response = None
+    data = None
+    for i in range(3):
+        response = requests.get(url)
+        response.encoding = "gbk"  # 解决中文乱码
+        try:
+            data = response.text.split("=")[1].strip('"').split("~")
+            break
+        except IndexError:
+            if i < 2:
+                print(f'err res: {response.text}, try again ...')
+            else:
+                print('max retry times reached, exit ...')
+                exit()
+    
     data = [item for item in data if item.strip()]
     
     return {

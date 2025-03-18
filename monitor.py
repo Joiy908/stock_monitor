@@ -1,6 +1,6 @@
 import time
 import os
-import datetime
+from datetime import datetime
 from fetcher import fetch_stock_data
 from notifier import send_email
 
@@ -23,18 +23,24 @@ if not recipient_email:
 
 # 定义要监控的股票列表
 stocks_to_monitor = [
+    # {
+    #     "stock_code": "sz123252",  # 股票代码
+    #     "cost_price": 130.814,       # 成本价
+    #     "increase_threshold": 10.0, # 涨幅度阈值（百分比）
+    #     "decrease_threshold": 10.0  # 跌幅度阈值（百分比）
+    # },
     {
         "stock_code": "sz123252",  # 股票代码
-        "cost_price": 130.814,       # 成本价
-        "increase_threshold": 10.0, # 涨幅度阈值（百分比）
-        "decrease_threshold": 10.0  # 跌幅度阈值（百分比）
-    },
+        "cost_price": 136,       # 成本价
+        "increase_threshold": 3.0, # 涨幅度阈值（百分比）
+        "decrease_threshold": 2.0  # 跌幅度阈值（百分比）
+    }
     # 可以添加更多股票
 ]
 
 
 def is_market_open():
-    now = datetime.datetime.now()
+    now = datetime.now()
     # 9:30 AM - 11:30 AM or 1:00 PM - 3:00 PM
     if (now.hour == 9 and now.minute >= 30) or (now.hour >= 10 and now.hour < 11) or (now.hour == 11 and now.minute < 30):
         return True
@@ -52,7 +58,8 @@ def check_price_changes(stock_data, stock_info):
 
     # 计算涨幅和跌幅
     price_change_percent = ((current_price - cost_price) / cost_price) * 100
-    # print('price change percent: ', price_change_percent)
+    print(f'{datetime.now():%Y-%m-%d %H:%M:%S}, name: {stock_data["name"]}, ' +
+          f'current price: {current_price:.2f}, price change percent:  {price_change_percent:+.2f}%')
 
     if price_change_percent >= increase_threshold:
         subject = f"Stock Alert: {stock_data['name']} ({stock_data['code']})"

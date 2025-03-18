@@ -35,6 +35,8 @@ def send_email(subject, body, to_email):
         print(f"Email sent to {to_email} successfully.")
     except Exception as e:
         print(f"Failed to send email: {e}")
+    # todo: add 抑制机制
+    exit()
 
 # 示例调用
 if __name__ == "__main__":
