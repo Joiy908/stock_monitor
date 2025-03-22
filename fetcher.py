@@ -1,5 +1,6 @@
 import requests
 
+
 def fetch_stock_data(stock_code: str):
     url = f"http://qt.gtimg.cn/q={stock_code}"
     # try at most 3 times
@@ -13,13 +14,13 @@ def fetch_stock_data(stock_code: str):
             break
         except IndexError:
             if i < 2:
-                print(f'err res: {response.text}, try again ...')
+                print(f"err res: {response.text}, try again ...")
             else:
-                print('max retry times reached, exit ...')
+                print("max retry times reached, exit ...")
                 exit()
-    
+
     data = [item for item in data if item.strip()]
-    
+
     return {
         "name": data[1],
         "code": data[2],
@@ -39,12 +40,13 @@ def fetch_stock_data(stock_code: str):
         # "market_cap": float(data[45]),
     }
 
+
 def fetch_funds_flow(stock_code: str):
     url = f"http://qt.gtimg.cn/q=ff_{stock_code}"
     response = requests.get(url)
     response.encoding = "gbk"
     data = response.text.split("=")[1].strip('"').split("~")
-    
+
     return {
         "code": data[0],
         "main_inflow": float(data[1]),
@@ -58,12 +60,13 @@ def fetch_funds_flow(stock_code: str):
         "date": data[13],
     }
 
+
 def fetch_market_analysis(stock_code: str):
     url = f"http://qt.gtimg.cn/q=s_pk{stock_code}"
     response = requests.get(url)
     response.encoding = "gbk"
     data = response.text.split("=")[1].strip('"').split("~")
-    
+
     return {
         "big_buy_orders": float(data[0]),
         "small_buy_orders": float(data[1]),
@@ -71,12 +74,13 @@ def fetch_market_analysis(stock_code: str):
         "small_sell_orders": float(data[3]),
     }
 
+
 def fetch_stock_summary(stock_code: str):
     url = f"http://qt.gtimg.cn/q=s_{stock_code}"
     response = requests.get(url)
     response.encoding = "gbk"
     data = response.text.split("=")[1].strip('"').split("~")
-    
+
     return {
         "name": data[1],
         "code": data[2],
@@ -87,6 +91,7 @@ def fetch_stock_summary(stock_code: str):
         "turnover": float(data[7]),
         "market_cap": float(data[9]),
     }
+
 
 if __name__ == "__main__":
     stock_code = "sz300337"  # 示例股票代码

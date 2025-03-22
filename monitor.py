@@ -1,12 +1,8 @@
-import time
 import os
+import time
 from datetime import datetime
-from fetcher import fetch_stock_data
-from notifier import send_email
-
 
 from dotenv import load_dotenv
-
 
 from fetcher import fetch_stock_data
 from notifier import send_email
@@ -31,9 +27,9 @@ stocks_to_monitor = [
     # },
     {
         "stock_code": "sz123252",  # 股票代码
-        "cost_price": 136,       # 成本价
-        "increase_threshold": 3.0, # 涨幅度阈值（百分比）
-        "decrease_threshold": 2.0  # 跌幅度阈值（百分比）
+        "cost_price": 132.33,  # 成本价
+        "increase_threshold": 3.0,  # 涨幅度阈值（百分比）
+        "decrease_threshold": 3.0,  # 跌幅度阈值（百分比）
     }
     # 可以添加更多股票
 ]
@@ -42,11 +38,11 @@ stocks_to_monitor = [
 def is_market_open():
     now = datetime.now()
     # 9:30 AM - 11:30 AM or 1:00 PM - 3:00 PM
-    if (now.hour == 9 and now.minute >= 30) or (now.hour >= 10 and now.hour < 11) or (now.hour == 11 and now.minute < 30):
-        return True
-    elif (now.hour == 13 and now.minute >= 0) or (now.hour > 13 and now.hour < 15):
-        return True
-    return False
+    return bool(now.hour == 9 and now.minute >= 30
+    or now.hour >= 10 and now.hour < 11
+    or now.hour == 11 and now.minute < 30
+    or now.hour == 13 and now.minute >= 0
+    or now.hour > 13 and now.hour < 15)
 
 
 
@@ -58,17 +54,21 @@ def check_price_changes(stock_data, stock_info):
 
     # 计算涨幅和跌幅
     price_change_percent = ((current_price - cost_price) / cost_price) * 100
-    print(f'{datetime.now():%Y-%m-%d %H:%M:%S}, name: {stock_data["name"]}, ' +
-          f'current price: {current_price:.2f}, price change percent:  {price_change_percent:+.2f}%')
+    print(
+        f"{datetime.now():%Y-%m-%d %H:%M:%S}, name: {stock_data['name']}, "
+        + f"current price: {current_price:.2f}, price change percent:  {price_change_percent:+.2f}%"
+    )
 
     if price_change_percent >= increase_threshold:
         subject = f"Stock Alert: {stock_data['name']} ({stock_data['code']})"
-        body = f"The stock has increased by {price_change_percent:.2f}%.\nCurrent Price: {current_price}.\nCost Price: {cost_price}."
+        body = f"The stock has increased by {price_change_percent:.2f}%.\n" + \
+            "Current Price: {current_price}.\nCost Price: {cost_price}."
         send_email(subject, body, recipient_email)
         print(f"Sent increase alert for {stock_data['name']}.")
     elif price_change_percent <= -decrease_threshold:
         subject = f"Stock Alert: {stock_data['name']} ({stock_data['code']})"
-        body = f"The stock has decreased by {price_change_percent:.2f}%.\nCurrent Price: {current_price}.\nCost Price: {cost_price}."
+        body = f"The stock has decreased by {price_change_percent:.2f}%.\n"+ \
+            "Current Price: {current_price}.\nCost Price: {cost_price}."
         send_email(subject, body, recipient_email)
         print(f"Sent decrease alert for {stock_data['name']}.")
 
@@ -83,8 +83,8 @@ def monitor_stocks():
         else:
             print("Stock market is closed. Waiting for market hours...")
             time.sleep(60)  # 每分钟检查一次，直到市场开盘
-            
+
 
 if __name__ == "__main__":
-    data = fetch_stock_data(stocks_to_monitor[0]['stock_code']) 
+    data = fetch_stock_data(stocks_to_monitor[0]["stock_code"])
     check_price_changes(data, stocks_to_monitor[0])
