@@ -27,9 +27,9 @@ stocks_to_monitor = [
     # },
     {
         "stock_code": "sz123252",  # 股票代码
-        "cost_price": 128.88,  # 成本价
-        "increase_threshold": 3.0,  # 涨幅度阈值（百分比）
-        "decrease_threshold": 6.0,  # 跌幅度阈值（百分比）
+        "cost_price": 120.88,  # 成本价
+        "increase_threshold": 5.0,  # 涨幅度阈值（百分比）
+        "decrease_threshold": 3.0,  # 跌幅度阈值（百分比）
     }
     # 可以添加更多股票
 ]
