@@ -47,6 +47,10 @@ def send_email(subject, body, to_email):
 
         print(f"Email sent to {to_email} successfully.")
         datetime_now = datetime.now()
+        for subject, _ in db:
+            if subject == subject:
+                db.remove((subject, _))
+                break
         db.append((subject, datetime_now))
     except Exception as e:
         print(f"Failed to send email: {e}")
