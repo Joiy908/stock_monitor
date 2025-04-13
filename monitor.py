@@ -27,9 +27,9 @@ stocks_to_monitor = [
     # },
     {
         "stock_code": "sz123252",  # 股票代码
-        "cost_price": 132.33,  # 成本价
+        "cost_price": 128.88,  # 成本价
         "increase_threshold": 3.0,  # 涨幅度阈值（百分比）
-        "decrease_threshold": 3.0,  # 跌幅度阈值（百分比）
+        "decrease_threshold": 6.0,  # 跌幅度阈值（百分比）
     }
     # 可以添加更多股票
 ]
@@ -61,19 +61,22 @@ def check_price_changes(stock_data, stock_info):
 
     if price_change_percent >= increase_threshold:
         subject = f"Stock Alert: {stock_data['name']} ({stock_data['code']})"
-        body = f"The stock has increased by {price_change_percent:.2f}%.\n" + \
-            "Current Price: {current_price}.\nCost Price: {cost_price}."
+        body = (f"The stock has increased by {price_change_percent:.2f}%.\n"
+            f"Current Price: {current_price}.\nCost Price: {cost_price}.")
         send_email(subject, body, recipient_email)
         print(f"Sent increase alert for {stock_data['name']}.")
     elif price_change_percent <= -decrease_threshold:
         subject = f"Stock Alert: {stock_data['name']} ({stock_data['code']})"
-        body = f"The stock has decreased by {price_change_percent:.2f}%.\n"+ \
-            "Current Price: {current_price}.\nCost Price: {cost_price}."
+        body = (f"The stock has decreased by {price_change_percent:.2f}%.\n"
+            f"Current Price: {current_price}.\nCost Price: {cost_price}.")
         send_email(subject, body, recipient_email)
         print(f"Sent decrease alert for {stock_data['name']}.")
 
 
 def monitor_stocks():
+    for stock_info in stocks_to_monitor:
+        stock_data = fetch_stock_data(stock_info["stock_code"])
+        check_price_changes(stock_data, stock_info)
     while True:
         if is_market_open():
             for stock_info in stocks_to_monitor:

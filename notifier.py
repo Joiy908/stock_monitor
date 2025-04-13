@@ -1,15 +1,28 @@
 import os
 import smtplib
+from datetime import datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from dotenv import load_dotenv
 
-# 加载 .env 文件中的环境变量
 load_dotenv()
 
 
+# tuple([last subject sent]:[last time sent])
+db = []
+
+SUPRESSION_INTERVAL = os.getenv("SUPRESSION_INTERVAL", 60 * 10) # units: second
+
+
 def send_email(subject, body, to_email):
+    # check suppression
+    datetime_now = datetime.now()
+    for _, (last_subject, last_time) in enumerate(db):
+        if subject == last_subject and datetime_now - last_time < timedelta(seconds=SUPRESSION_INTERVAL):
+            print(f"Email suppressed for subject: {subject}")
+            return
+
     try:
         from_email = os.getenv("EMAIL_ADDRESS")
         password = os.getenv("EMAIL_PASSWORD")
@@ -33,10 +46,10 @@ def send_email(subject, body, to_email):
         server.quit()
 
         print(f"Email sent to {to_email} successfully.")
+        datetime_now = datetime.now()
+        db.append((subject, datetime_now))
     except Exception as e:
         print(f"Failed to send email: {e}")
-    # todo: add 抑制机制
-    exit()
 
 
 # 示例调用
